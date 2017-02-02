@@ -21,6 +21,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.example.android.common.logger.Log;
 import com.example.android.common.logger.LogWrapper;
+import com.example.android.oauthTesting_slidingTabBasic.R;
 
 /**
  * Base launcher activity, to handle most of the common plumbing for samples.

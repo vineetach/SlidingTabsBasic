@@ -19,14 +19,54 @@ android {
     defaultConfig {
         minSdkVersion 13
         targetSdkVersion 24
+
+        applicationId "com.example.android.oauthTesting_slidingTabBasic"
+        versionCode 2
+        versionName "1.1"
+        multiDexEnabled true
+        generatedDensities = []
+        resValue "string", "server_ip", "qa-r4e-mobile.reputation.com"
+        dexOptions {
+            incremental true
+            javaMaxHeapSize "4g"
+        }
+        /*aaptOptions {
+            additionalParameters "--no-version-vectors"
+         }*/
+        lintOptions {
+            // set to true to turn off analysis progress reporting by lint 
+            quiet true
+            // if true, stop the gradle build if errors are found 
+            abortOnError false
+            // if true, only report errors 
+            ignoreWarnings true
+        }
+    }
+
+    productFlavors {
+        reputation {
+            applicationId "com.example.android.oauthTesting_slidingTabBasic"
+
+        }
+
+        ford {
+            applicationId "com.example.ford.android.oauthTesting_slidingTabBasic"
+        }
     }
 
     sourceSets {
+        reputation { assets.srcDirs = ['src/reputation/assets/'] }
+        ford { assets.srcDirs = ['src/ford/assets/'] }
+
+        reputation { res.srcDirs = ['src/reputation/res'] }
+        ford { res.srcDirs = ['src/ford/res'] }
+
         main {
-            dirs.each { dir ->
+            res.srcDirs = ['src/main/res']
+           /* dirs.each { dir ->
                 java.srcDirs "src/${dir}/java"
                 res.srcDirs "src/${dir}/res"
-            }
+            }*/
         }
         androidTest.setRoot('tests')
         androidTest.java.srcDirs = ['tests/src']
