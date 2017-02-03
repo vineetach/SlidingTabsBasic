@@ -88,8 +88,8 @@ android {
                     variant.outputs.each { output ->
 
                         //Note:- This is read from ~/.gradle/gradle.properties file. Do not put gradle.properties in project folder
-                        def destination = builds_archive_folder;
-                        destination += "/" + flavor.name;
+                        //def destination = builds_archive_folder;
+                        //destination += "/" + flavor.name;
 
                         def taskSuffix = variant.name.capitalize()
                         def buildNumber = System.getenv("BUDDYBUILD_BUILD_NUMBER") as Integer ?: "";
@@ -131,33 +131,6 @@ android {
                             newName = apkName + "-" + defaultConfig.versionName + snapshot + "-" + flavor.name + "-" + buildType + "-" + buildNumber + signed + zipAligned;
 
                             output.outputFile = new File(apk.parentFile, newName + ".apk");
-
-                            if (destination != "") {
-
-                                def deleteOldArchivedFileTask = tasks.create(name: "deleteOldArchivedBuilds${taskSuffix}", type: Exec) {
-                                    workingDir "${rootDir}/${project.name}/build_scripts/";
-                                    commandLine "./deleteOldBuilds.sh"
-                                    args flavor.name, destination, scriptBuildNumber, buildType
-                                }
-
-                                def copyAPKTask = tasks.create(name: "archive${taskSuffix}", type: Copy) {
-                                    description "Archive/copy APK and mappings.txt to a versioned folder."
-                                    def proguardMappingName = apkName + "-" + defaultConfig.versionName + snapshot + "-" + flavor.name + "-" + buildType + "-" + buildNumber + "mapping.txt";
-
-                                    from("${buildDir}") {
-                                        include "**/mapping/${flavor.name}/${variant.buildType.name}/mapping.txt"
-                                        rename 'mapping.txt', proguardMappingName
-                                        include "**/apk/${output.outputFile.name}"
-                                    }
-                                    into destination
-                                    eachFile { file ->
-                                        file.path = file.name
-                                    }
-                                    includeEmptyDirs = false
-                                }
-
-                                tasks[assembleTaskName].finalizedBy = [copyAPKTask, deleteOldArchivedFileTask]
-                            }
                         }
                     }
                 }
