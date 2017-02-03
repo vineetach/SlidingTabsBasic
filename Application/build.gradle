@@ -59,8 +59,6 @@ android {
     buildTypes {
         debug {
             debuggable true
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         prod {
@@ -143,22 +141,6 @@ android {
 
                             output.outputFile = new File(apk.parentFile, newName + ".apk");
 
-                            def copyAPKTask = tasks.create(name: "archive${taskSuffix}", type: Copy) {
-                                description "Archive/copy APK and mappings.txt to a versioned folder."
-                                def proguardMappingName = apkName + "-" + defaultConfig.versionName + snapshot + "-" + flavor.name + "-" + buildType + "-" + buildNumber + "mapping.txt";
-
-                                from("${buildDir}") {
-                                    include "**/mapping/${flavor.name}/${variant.buildType.name}/mapping.txt"
-                                    rename 'mapping.txt', proguardMappingName
-                                }
-                                into "${buildDir}/mapping/${flavor.name}/${variant.buildType.name}"
-                                eachFile { file ->
-                                    file.path = file.name
-                                }
-                                includeEmptyDirs = false
-                            }
-
-                            tasks[assembleTaskName].finalizedBy = [copyAPKTask]
                         }
                     }
                 }
