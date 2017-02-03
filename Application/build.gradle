@@ -29,6 +29,7 @@ android {
         resValue "string", "server_ip", "qa-r4e-mobile.reputation.com"
     }
 
+
     lintOptions {
         // set to true to turn off analysis progress reporting by lint 
         quiet true
@@ -39,7 +40,6 @@ android {
     }
 
     dexOptions {
-        incremental true
         javaMaxHeapSize "4g"
     }
 
@@ -47,9 +47,20 @@ android {
         additionalParameters "--no-version-vectors"
     }
 
+    /*signingConfigs {
+        release {
+            storeFile file(androidkeystore)
+            storePassword storepassword
+            keyAlias keyalias
+            keyPassword keypassword
+        }
+    }*/
+
     buildTypes {
         debug {
             debuggable true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         prod {
@@ -63,7 +74,7 @@ android {
         }
 
         qa {
-            minifyEnabled false
+            minifyEnabled true
             //signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
@@ -72,7 +83,7 @@ android {
 
         dev {
             minifyEnabled false
-            //signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
             debuggable true
@@ -131,6 +142,23 @@ android {
                             newName = apkName + "-" + defaultConfig.versionName + snapshot + "-" + flavor.name + "-" + buildType + "-" + buildNumber + signed + zipAligned;
 
                             output.outputFile = new File(apk.parentFile, newName + ".apk");
+
+                            def copyAPKTask = tasks.create(name: "archive${taskSuffix}", type: Copy) {
+                                description "Archive/copy APK and mappings.txt to a versioned folder."
+                                def proguardMappingName = apkName + "-" + defaultConfig.versionName + snapshot + "-" + flavor.name + "-" + buildType + "-" + buildNumber + "mapping.txt";
+
+                                from("${buildDir}") {
+                                    include "**/mapping/${flavor.name}/${variant.buildType.name}/mapping.txt"
+                                    rename 'mapping.txt', proguardMappingName
+                                }
+                                into "${buildDir}/mapping/${flavor.name}/${variant.buildType.name}"
+                                eachFile { file ->
+                                    file.path = file.name
+                                }
+                                includeEmptyDirs = false
+                            }
+
+                            tasks[assembleTaskName].finalizedBy = [copyAPKTask]
                         }
                     }
                 }
