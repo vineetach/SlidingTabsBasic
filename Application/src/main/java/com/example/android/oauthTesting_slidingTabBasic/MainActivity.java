@@ -73,7 +73,7 @@ public class MainActivity extends SampleActivityBase {
     public void setActionBarTitle(String title) {
         ActionBar bar = this.getActionBar();
         if(bar != null) {
-            bar.setTitle("Hello");
+            bar.setTitle(R.string.app_name);
         }
     }
 
